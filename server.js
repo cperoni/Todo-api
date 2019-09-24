@@ -35,50 +35,47 @@ app.get('/todos', function (req, res) {
 app.get('/todos/:id', function (req, res) {
     var todoid = parseInt(req.params.id, 10);
 
-    var matchedTodo = _.findWhere(todos, { id: todoid });
-
-    if (matchedTodo) {
-        res.json(matchedTodo);
-    } else {
-        res.status(404).send();
-    }
+    db.todo.findByPk(todoid).then(function (todoItem) {
+        if (!!todoItem) {
+            res.json(todoItem.toJSON());
+        } else {
+            res.status(404).send();
+        }
+    }, function (e) {
+        res.status(500).send(e);
+    })
 });
 
 //POST /todos
 app.post('/todos', function (req, res) {
     var body = _.pick(req.body, 'description', 'completed');
 
-
-    db.todo.create(body).then(function (todo) {
-        res.json(todo.toJSON());
+    db.todo.create(body).then(function (todoItem) {
+        res.json(todoItem.toJSON());
     }, function (e) {
         res.status(400).json(e);
     });
-
-    // if (!_.isBoolean(body.completed) || !_.isString(body.description) || body.description.trim().length === 0) {
-    //     return res.status(400).send();
-    // }
-
-    // body.description = body.description.trim();
-    // todoNextId = todos.length + 1;
-
-    // body.id = todoNextId;
-    // todos.push(body);
-
-    // res.json(body);
 });
 
 //DELETE /todos/:id
 app.delete('/todos/:id', function (req, res) {
     var todoid = parseInt(req.params.id, 10);
-    var todoToDelete = _.findWhere(todos, { id: todoid });
 
-    if (_.isUndefined(todoToDelete)) {
-        res.status(404).json({ "error": "no todo find with that id" });
-    } else {
-        todos = _.without(todos, todoToDelete);
-        res.json(todoToDelete);
-    }
+    db.todo.findByPk(todoid).then(function (todoItem) {
+        todoItem.destroy();
+        res.json(todoItem.toJSON());
+    }, function (e) {
+        res.status(404).json(e);
+    });
+
+    // var todoToDelete = _.findWhere(todos, { id: todoid });
+
+    // if (_.isUndefined(todoToDelete)) {
+    //     res.status(404).json({ "error": "no todo find with that id" });
+    // } else {
+    //     todos = _.without(todos, todoToDelete);
+    //     res.json(todoToDelete);
+    // }
 })
 
 //PUT /todos/:id

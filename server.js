@@ -123,3 +123,14 @@ db.sequelize.sync().then(function () {
         console.log('Express listening on port ' + PORT);
     });
 });
+
+//POST Users
+app.post('/users', function (req, res) {
+    var body = _.pick(req.body, 'email', 'password');
+
+    db.user.create(body).then(function (userItem) {
+        res.json(userItem.toJSON());
+    }, function (e) {
+        res.status(400).json(e);
+    });
+})

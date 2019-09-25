@@ -118,19 +118,19 @@ app.get('/', function (req, res) {
     res.send('Todo API Root');
 });
 
-db.sequelize.sync().then(function () {
-    app.listen(PORT, function () {
-        console.log('Express listening on port ' + PORT);
-    });
-});
-
 //POST Users
 app.post('/users', function (req, res) {
     var body = _.pick(req.body, 'email', 'password');
 
     db.user.create(body).then(function (userItem) {
-        res.json(userItem.toJSON());
+        res.json(userItem.email);
     }, function (e) {
         res.status(400).json(e);
     });
 })
+
+db.sequelize.sync({ force: true }).then(function () {
+    app.listen(PORT, function () {
+        console.log('Express listening on port ' + PORT);
+    });
+});

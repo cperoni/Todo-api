@@ -8,6 +8,7 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
+            // "program": "${workspaceFolder}\\playground\\basic-sqlite-database.js"
             "program": "${workspaceFolder}\\server.js"
         }
     ]

@@ -90,6 +90,28 @@ module.exports = function (sequelize, DataTypes) {
                 rej();
             });
         });
+    };
+
+    User.findByToken = function (token) {
+        return new Promise(function (resolve, reject) {
+            try {
+                var decodedJWT = jwt.verify(token, 'qwerty098');
+                var bytes = cryptojs.AES.decrypt(decodedJWT.token, '12345678');
+                var tokenData = JSON.parse(bytes.toString(cryptojs.enc.Utf8));
+                User.findByPk(tokenData.id).then(function (user) {
+                    if (user) {
+                        resolve(user);
+                    } else {
+                        reject();
+                    }
+                }, function (e) {
+                    reject();
+                })
+            } catch (e) {
+                console.error(e);
+                reject();
+            }
+        });
     }
 
     return User;
